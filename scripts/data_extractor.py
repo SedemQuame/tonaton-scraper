@@ -13,24 +13,17 @@ DB_NAME = f'data.db'
 
 # getting env variables
 CLIENT = pymongo.MongoClient("mongodb+srv://aggregator_admin:bnGPi7uOtYBKwajc@tonaton.kudrx.mongodb.net/aggregator_admin?retryWrites=true&w=majority")
-db = CLIENT.test
+db_remote = CLIENT.test
 db_local = db_connector.LocalDBStore(DB_NAME)
 db_local.createConnection()
 categories = None
+
 with open(CATEGORY_JSON, f'r') as readData:
     categories = json.load(readData)
 
 for category in categories:
-    # PRODUCT_JSON = f'json/{category["name"]}/product.json'
-
-    # products = None
-    # with open(PRODUCT_JSON, f'r') as readData:
-    #     products = json.load(readData)
-
-    data = db_local.selectPagesOfData('products', category["name"])
+    data = db_local.selectPagesOfData(category["name"], category["name"])
     for row in data:
-
-    # for URL in products["unvisited"]:
         try:
             response = requests.get(row[0], timeout=45)
 
@@ -39,7 +32,6 @@ for category in categories:
 
             # get information container of interest.
             jsonData = (bs.find_all(f'script')[1].string).replace("window.initialData = ", "")
-
             adDetail = json.loads(jsonData)["adDetail"]["data"]["ad"]
 
             productDetail = {
@@ -62,16 +54,17 @@ for category in categories:
                 "money": adDetail["money"],
             }
 
-            result = db[category["name"]].insert_one(productDetail)
+            result = db_remote[category["name"]].insert_one(productDetail)
 
             if result.acknowledged:
+                # label link as success
                 print(f'Successfully, stored scraped {category["name"]} data into database.')
                 print("Video id: " + str(result.inserted_id))
             else:
+                # label link as a failure
                 print("Failed, to store vehicle data into database.")
 
             del response
         except Exception as e:
-                # register faulty link here.
-            print(f'Faulty link')
+            # register faulty link here.
             print(e)

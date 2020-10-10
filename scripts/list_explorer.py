@@ -17,18 +17,13 @@ categories = None
 with open(CATEGORY_JSON, f'r') as readData:
     categories = json.load(readData)
 
-# count = 0
 db_local = db_connector.LocalDBStore(DB_NAME)
 db_local.createConnection()
-db_local.createDbTable('products')
-category_shallow_copy = categories
+
 for category in categories:
+    db_local.createDbTable(category["name"])
 
     # will hold a batch of links popped from visited and appended to unvisited links
-    # unvisitedToVisitedLinksBatchTransition = []
-    # count = 0
-
-    # visitedLinkCounter = 0
     for URL in category["paginatedLinks"]["unvisited"]:
         try:
             # parse response text to beautiful soup, for parsing into an object.
@@ -41,8 +36,8 @@ for category in categories:
 
             # insert ad links to database
             for ad in ads:
-                db.insertProductsInToDbTable('products', category["name"], 'unvisited', f'https://tonaton.com/en/ad/{ad["slug"]}')
+                db_local.insertProductsInToDbTable(category["name"], category["name"], 'unvisited', f'https://tonaton.com/en/ad/{ad["slug"]}')
             del ads
         except Exception as e:
+            # register faulty link here.
             print(e)
-

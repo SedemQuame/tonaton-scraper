@@ -11,3 +11,4 @@ To run the script, clone this repository and run the command
 4. dnspython
 5. lxml
 6. sqlite3
+
