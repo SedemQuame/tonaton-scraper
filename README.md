@@ -12,8 +12,8 @@ To run the script, clone this repository and run the command
 5. lxml
 6. sqlite3
 
-To collect the data, into you own database, please change the location pointing to my mongodb,
-database to yours, in the data_connector.py file.
+To collect the data, into your own remote database, please change the location pointing to my mongodb,
+database to yours, in the data_connector.py file. Or change the code, if you are using some other DB.
 
 Below is a link to an article, which demonstrates how to get that done.
 https://intercom.help/mongodb-atlas/en/articles/3013643-creating-databases-and-collections-for-atlas-clusters
